@@ -3,7 +3,7 @@ version: '3'
 services:
   app:
     container_name: app-v1
-    restart: always
+    restart: "no"
     logging:
       driver: "json-file"
       options:
