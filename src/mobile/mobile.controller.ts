@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Inject, OnModuleInit, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, OnModuleInit, Param, Post, UseGuards } from '@nestjs/common';
 import { MobileService } from './mobile.service';
 import { ClientKafka } from '@nestjs/microservices';
 import { Distance } from './distance/interfaces/distance.interface';
@@ -15,6 +15,7 @@ export class MobileController implements OnModuleInit {
   async onModuleInit() {
     const requestPatters = [
       'createOrUpdateDistance',
+      'findNearestCoordinates'
     ]
 
     requestPatters.forEach(async pattern => {
@@ -27,6 +28,17 @@ export class MobileController implements OnModuleInit {
   @UseGuards(AuthGuardAccount)
   createOrUpdateDistance(@Body() distance: Distance): Observable<Distance> {
     return this.client.send('createOrUpdateDistance', distance).pipe(
+      catchError((error) => {
+        throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
+      })
+    );
+  }
+
+  @Get('find-nearest-coordinates/:latitude/:longitude')
+  @UseGuards(AuthGuardAccount)
+  findNearestCoordinates(@Param('latitude') latitude: number, @Param('longitude') longitude: number): Observable<{ latitude: number, longitude: number }[]> {
+    const distance = { latitude, longitude }
+    return this.client.send('findNearestCoordinates', distance).pipe(
       catchError((error) => {
         throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
       })
