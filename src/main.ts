@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as express from 'express';
 import { join } from 'path';
 import { catchError, throwError, timeout } from 'rxjs';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,10 +15,10 @@ async function bootstrap() {
         catchError(error => {
           if (error.name === 'TimeoutError') {
             // Se ocorrer um timeout, envie um erro 408 de volta para o cliente
-            return throwError(new Error('Request Timeout'));
+            throw new HttpException('Request Timeout', HttpStatus.REQUEST_TIMEOUT)
           }
           // Se ocorrer outro erro, repasse-o para o manipulador de erros padrão
-          return throwError(error);
+          throw new HttpException(error, HttpStatus.REQUEST_TIMEOUT)
         }),
       );
     },
