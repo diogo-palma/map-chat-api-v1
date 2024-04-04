@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MobileService } from './mobile.service';
 import { MobileController } from './mobile.controller';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
+import { AccountModule } from 'src/account/account.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
     ]),
+    AccountModule
   ],
   controllers: [MobileController],
   providers: [
