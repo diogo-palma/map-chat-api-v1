@@ -34,11 +34,10 @@ export class MobileController implements OnModuleInit {
     );
   }
 
-  @Get('find-nearest-coordinates/:latitude/:longitude')
+  @Post('find-nearest-coordinates')
   @UseGuards(AuthGuardAccount)
-  findNearestCoordinates(@Param('latitude') latitude: number, @Param('longitude') longitude: number): Observable<{ latitude: number, longitude: number }[]> {
-    const distance = { latitude, longitude }
-    return this.client.send('findNearestCoordinates', distance).pipe(
+  findNearestCoordinates(@Body() data: { accountId: string, latitude: number, longitude: number }): Observable<{ latitude: number, longitude: number }[]> {
+    return this.client.send('findNearestCoordinates', data).pipe(
       catchError((error) => {
         throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
       })
