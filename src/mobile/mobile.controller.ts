@@ -17,7 +17,8 @@ export class MobileController implements OnModuleInit {
     const requestPatters = [
       'createOrUpdateDistance',
       'findNearestCoordinates',
-      'createChat'
+      'createChat',
+      'getChatsByAccountId'
     ]
 
     requestPatters.forEach(async pattern => {
@@ -50,6 +51,16 @@ export class MobileController implements OnModuleInit {
   @UseGuards(AuthGuardAccount)
   createChat(@Body() data: { accountIds: string[], message: string, fromIdMessage: string }): Observable<Chat> {
     return this.client.send('createChat', data).pipe(
+      catchError((error) => {
+        throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
+      })
+    );
+  }
+
+  @Get('get-chat-by-account/:accountId')
+  @UseGuards(AuthGuardAccount)
+  getChatsByAccountId(@Param('accountId') accountId: string): Observable<Chat> {
+    return this.client.send('getChatsByAccountId', accountId).pipe(
       catchError((error) => {
         throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
       })
