@@ -4,6 +4,7 @@ import { ClientKafka } from '@nestjs/microservices';
 import { Distance } from './distance/interfaces/distance.interface';
 import { Observable, catchError } from 'rxjs';
 import { AuthGuardAccount } from 'src/auth/auth.account.middleware';
+import { Chat } from './chat/chat.interface';
 
 @Controller('mobile')
 export class MobileController implements OnModuleInit {
@@ -15,7 +16,8 @@ export class MobileController implements OnModuleInit {
   async onModuleInit() {
     const requestPatters = [
       'createOrUpdateDistance',
-      'findNearestCoordinates'
+      'findNearestCoordinates',
+      'createChat'
     ]
 
     requestPatters.forEach(async pattern => {
@@ -38,6 +40,16 @@ export class MobileController implements OnModuleInit {
   @UseGuards(AuthGuardAccount)
   findNearestCoordinates(@Body() data: { accountId: string, latitude: number, longitude: number }): Observable<{ latitude: number, longitude: number }[]> {
     return this.client.send('findNearestCoordinates', data).pipe(
+      catchError((error) => {
+        throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
+      })
+    );
+  }
+
+  @Post('create-chat')
+  @UseGuards(AuthGuardAccount)
+  createChat(@Body() data: { accountIds: string[], message: string, fromIdMessage: string }): Observable<Chat> {
+    return this.client.send('createChat', data).pipe(
       catchError((error) => {
         throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
       })
