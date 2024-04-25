@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { MobileModule } from './mobile/mobile.module';
+import { NotificationModule } from './notification/notification.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -30,6 +31,7 @@ const ENV = process.env.NODE_ENV;
     UsersModule,
     AccountModule,
     MobileModule,
+    NotificationModule,
 
   ],
   controllers: [AppController],
