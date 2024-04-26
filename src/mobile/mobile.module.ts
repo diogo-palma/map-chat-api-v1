@@ -3,6 +3,7 @@ import { MobileService } from './mobile.service';
 import { MobileController } from './mobile.controller';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { AccountModule } from 'src/account/account.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { AccountModule } from 'src/account/account.module';
         },
       },
     ]),
-    AccountModule
+    AccountModule,
+    NotificationModule
   ],
   controllers: [MobileController],
   providers: [
@@ -31,7 +33,7 @@ import { AccountModule } from 'src/account/account.module';
       useFactory: (kafkaClient: ClientKafka) => kafkaClient,
       inject: ['mobile-account_producer_client'],
     },
-    MobileService
+    MobileService,
   ],
 })
 export class MobileModule { }

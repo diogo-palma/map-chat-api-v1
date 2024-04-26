@@ -2,15 +2,17 @@ import { Body, Controller, Get, HttpException, HttpStatus, Inject, OnModuleInit,
 import { MobileService } from './mobile.service';
 import { ClientKafka } from '@nestjs/microservices';
 import { Distance } from './distance/interfaces/distance.interface';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, tap } from 'rxjs';
 import { AuthGuardAccount } from 'src/auth/auth.account.middleware';
 import { Chat } from './chat/chat.interface';
+import { NotificationGateway } from 'src/notification/notification.gateway';
 
 @Controller('mobile')
 export class MobileController implements OnModuleInit {
   constructor(
     private readonly mobileService: MobileService,
     @Inject('mobile-account_producer') private readonly client: ClientKafka,
+    private readonly notificationGateway: NotificationGateway,
   ) { }
 
   async onModuleInit() {
@@ -53,6 +55,14 @@ export class MobileController implements OnModuleInit {
   @UseGuards(AuthGuardAccount)
   createChat(@Body() data: { accountIds: string[], message: string, fromIdMessage: string }): Observable<Chat> {
     return this.client.send('createChat', data).pipe(
+      tap((successResponse) => {
+        console.log("successResponse", successResponse)
+        const message = {
+          chatId: successResponse.id,
+          message: successResponse.chatMessage
+        }
+        this.notificationGateway.server.emit('chatAccountById', successResponse.chatMessage.accountsNeedRead, message)
+      }),
       catchError((error) => {
         throw new HttpException(error.message, HttpStatus.AMBIGUOUS);
       })

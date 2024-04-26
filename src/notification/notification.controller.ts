@@ -92,7 +92,7 @@ export class NotificationController implements OnModuleInit {
   @Post('test-notification')
   async testNotification(@Body() body: any) {
     console.log("oi", body)
-    this.notificationGateway.server.emit('notification', body)
+    this.notificationGateway.server.emit('chatAccountById', body.id, body.message)
   }
 
 

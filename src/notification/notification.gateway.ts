@@ -32,8 +32,8 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
     client.broadcast.emit('notification', message);
   }
 
-  @SubscribeMessage('account')
-  async onNotificationAccount(client, message) {
-    client.broadcast.emit('account', message);
+  @SubscribeMessage('chatAccountById')
+  async onAccountById(client, { id, message }) {
+    client.to(id).emit('chatAccountById', message);
   }
 }
