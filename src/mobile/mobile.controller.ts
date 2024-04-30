@@ -107,4 +107,14 @@ export class MobileController implements OnModuleInit {
       })
     );
   }
+
+  @Get('set-chat-message-read/:chatId/:accountId')
+  @UseGuards(AuthGuardAccount)
+  setChatMessageRead(@Param('chatId') chatId: string, @Param('accountId') accountId: string) {
+    const data = {
+      chatId,
+      accountId
+    }
+    return this.client.emit('setChatMessageRead', data)
+  }
 }
